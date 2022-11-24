@@ -17,7 +17,9 @@ function App() {
   return (
     <div className="App">
         <form>
-            <input type="text"/>
+            <input type="text" placeholder="Заголовок"/>
+            <input type="text" placeholder="Описание"/>
+            <button>Создать пост</button>
         </form>
         <PostList posts={posts} title={"Мой список"}></PostList>
     </div>
