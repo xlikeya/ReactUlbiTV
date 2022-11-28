@@ -2,7 +2,9 @@ import React, {useMemo, useState} from "react";
 import FormPost from "./components/FormPost";
 import PostList from "./components/PostList";
 import './styles/App.css'
-import MySelect from "./components/UI/select/MySelect";
+import PostFilter from "./components/PostFilter";
+import MyModal from "./components/UI/modal/MyModal";
+import MyButton from "./components/UI/button/MyButton";
 
 function App() {
     const [posts,setPosts] = useState([
@@ -13,61 +15,42 @@ function App() {
         {id: 5, title: 'Scala', body: 'Description5'},
         {id: 6, title: 'HTML о.О', body: 'Description6'},
     ])
-    const [searchQuery, setSearchQuery] = useState('')
-    const [selectedSort, setSelectedSort] = useState('')
+    const [filter, setFilter] = useState({sort: '', query: ''})
+    const [modal, setModal] = useState(false)
 
     const sortedPosts = useMemo(() =>{
-        console.log('Отработал хук useMemo')
-        if(selectedSort) {
-            return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+        if(filter.sort) {
+            return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
         }
         return posts;
-    }, [selectedSort, posts])
-
+    }, [filter.sort, posts])
 
     const sortedAndSearchedPosts = useMemo(() =>{
-        return sortedPosts.filter(post => post.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    }, [searchQuery, sortedPosts])
+        return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
+    }, [filter.query, sortedPosts])
 
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
     }
-const removePost = (post) => {
-        setPosts(posts.filter(p => p.id !== post.id))
-}
-
-const sortPosts = (sort) => {
-    setSelectedSort(sort);
-}
+    const removePost = (post) => {
+            setPosts(posts.filter(p => p.id !== post.id))
+    }
 
 
 
   return (
     <div className="App">
-        <FormPost create={createPost}></FormPost>
+        <MyButton onClick={() => setModal(true)}>Добавить</MyButton>
+        <MyModal visible={modal} setVisible={setModal}>
+            <FormPost create={createPost}></FormPost>
+        </MyModal>
+
         <hr style={{margin: '15px'}}/>
-        <div>
-            <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                plaseholder="Поиск..."
-            />
-            <MySelect
-                value={selectedSort}
-                onChange={sortPosts}
-                defaultValue="Сортировка"
-                options={[
-                    {value: 'title', name: 'По названию'},
-                    {value: 'body', name: 'По описанию'}
-                ]}
-            ></MySelect>
-        </div>
-        {sortedAndSearchedPosts.length
-            ?<PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Мой список"}></PostList>
-            : <h1 style={{textAlign: 'center'}}>
-                Список записей пуст
-            </h1>
-        }
+        <PostFilter
+            filter = {filter}
+            setFilter={setFilter}
+        ></PostFilter>
+            <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Мой список"}></PostList>
     </div>
   );
 }
