@@ -1,10 +1,11 @@
-import React, {useMemo, useState} from "react";
+import React, {useState} from "react";
 import FormPost from "./components/FormPost";
 import PostList from "./components/PostList";
 import './styles/App.css'
 import PostFilter from "./components/PostFilter";
 import MyModal from "./components/UI/modal/MyModal";
 import MyButton from "./components/UI/button/MyButton";
+import {usePosts} from "./hooks/usePosts";
 
 function App() {
     const [posts,setPosts] = useState([
@@ -17,30 +18,20 @@ function App() {
     ])
     const [filter, setFilter] = useState({sort: '', query: ''})
     const [modal, setModal] = useState(false)
-
-    const sortedPosts = useMemo(() =>{
-        if(filter.sort) {
-            return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
-        }
-        return posts;
-    }, [filter.sort, posts])
-
-    const sortedAndSearchedPosts = useMemo(() =>{
-        return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
-    }, [filter.query, sortedPosts])
-
+    const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
+        setModal(false)
     }
     const removePost = (post) => {
-            setPosts(posts.filter(p => p.id !== post.id))
+        setPosts(posts.filter(p => p.id !== post.id))
     }
 
 
 
   return (
     <div className="App">
-        <MyButton onClick={() => setModal(true)}>Добавить</MyButton>
+        <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}>Добавить</MyButton>
         <MyModal visible={modal} setVisible={setModal}>
             <FormPost create={createPost}></FormPost>
         </MyModal>
