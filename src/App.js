@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import FormPost from "./components/FormPost";
 import PostList from "./components/PostList";
 import './styles/App.css'
@@ -10,6 +10,9 @@ import PostService from "./API/PostService";
 import Loader from "./components/UI/loader/Loader";
 import {useFetching} from "./hooks/useFetching";
 import {getPageCount} from "./utils/pages";
+import {useObserver} from "./hooks/useObserver";
+import MySelect from "./components/UI/select/MySelect";
+import Pagination from "./components/UI/pagination/pagination";
 
 function App() {
     const [posts,setPosts] = useState([])
@@ -23,9 +26,10 @@ function App() {
         const response = await PostService.getAll(limit, page);
         setPosts(response.data)
         const totalCount = response.headers['x-total-count']
+        console.log(totalCount)
         setTotalPages(getPageCount(totalCount, limit))
     })
-
+    const lastElement = useRef()
 
 
     const createPost = (newPost) => {
@@ -36,10 +40,17 @@ function App() {
         setPosts(posts.filter(p => p.id !== post.id))
     }
 
-
+    /*useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+        setPage(page + 1);
+    })*/
     useEffect(() => {
-        fetchPosts()
-    }, [])
+        fetchPosts(limit, page)
+    }, [page, limit])
+
+    const changePage = (page) => {
+        setPage(page)
+    }
+
   return (
     <div className="App">
         <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}>Добавить</MyButton>
@@ -52,6 +63,17 @@ function App() {
             filter = {filter}
             setFilter={setFilter}
         ></PostFilter>
+        <MySelect
+            value={limit}
+            onChange={value => setLimit(value)}
+            defaultValue="Кол-во элементов на странице"
+            options={[
+                {value: 5, name: '5'},
+                {value: 10, name: '10'},
+                {value: 25, name: '25'},
+                {value: -1, name: 'Показать все'},
+            ]}
+        />
         {postError &&
             <h1>Произошла ошибка ${postError}</h1>
         }
@@ -60,6 +82,11 @@ function App() {
             :<PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Мой список"}></PostList>
 
         }
+        <Pagination
+            page={page}
+            changePage={changePage}
+            totalPages={totalPages}
+        />
     </div>
   );
 }
