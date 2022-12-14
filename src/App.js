@@ -10,7 +10,7 @@ import PostService from "./API/PostService";
 import Loader from "./components/UI/loader/Loader";
 import {useFetching} from "./hooks/useFetching";
 import {getPageCount} from "./utils/pages";
-import {useObserver} from "./hooks/useObserver";
+//import {useObserver} from "./hooks/useObserver";
 import MySelect from "./components/UI/select/MySelect";
 import Pagination from "./components/UI/pagination/pagination";
 
