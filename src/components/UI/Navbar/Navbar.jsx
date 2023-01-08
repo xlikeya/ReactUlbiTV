@@ -1,15 +1,35 @@
-import React from 'react';
-import {Link} from "react-router-dom";
+import React, { useState } from 'react';
+import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { Menu } from 'antd';
+import {useNavigate} from "react-router-dom";
+
+const items = [
+    {
+        label: 'О приложении',
+        key: 'mail',
+        icon: <MailOutlined />,
+        onClick: () => { navigate('/about')},
+    },
+    {
+        label: 'Список',
+        key: 'app',
+        icon: <AppstoreOutlined />,
+        onClick: () => { navigate('/posts')},
+    },
+    {
+        label: 'Список по уроку с Redux',
+        key: 'SubMenu',
+        icon: <SettingOutlined/>,
+        onClick: () => { navigate('/posts_redux')},
+    }
+];
 
 const Navbar = () => {
-    return (
-        <div className="navbar">
-            <div className="navbar__links">
-                <Link to="/about">О приложении</Link>
-                <Link to="/posts">Список</Link>
-            </div>
-        </div>
-    );
+    const [current, setCurrent] = useState('mail');
+    let navigate = useNavigate();
+
+    return <Menu selectedKeys={[current]} mode="horizontal" items={items} />;
+
 };
 
 export default Navbar;
