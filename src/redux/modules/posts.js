@@ -8,9 +8,6 @@ const defaultState = {
     posts: [],
 };
 
-/*
-  { type: GET_POSTS, payload: {...} }
-*/
 export default (state = defaultState, { type, payload }) => {
     switch (type) {
         case GET_POSTS:
